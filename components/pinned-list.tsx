@@ -1,17 +1,22 @@
-"use client"
+"use client";
 
-import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd"
-import { GripVertical } from "lucide-react"
-import type { ReactNode } from "react"
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DropResult,
+} from "@hello-pangea/dnd";
+import { GripVertical } from "lucide-react";
+import type { ReactNode } from "react";
 
 type SavedPlace = {
-  id: string
-  name: string
-  admin1?: string
-  country?: string
-  latitude: number
-  longitude: number
-}
+  id: string;
+  name: string;
+  admin1?: string;
+  country?: string;
+  latitude: number;
+  longitude: number;
+};
 
 export function PinnedList({
   items,
@@ -19,32 +24,32 @@ export function PinnedList({
   renderItem,
   empty,
 }: {
-  items: SavedPlace[]
-  onReorder: (next: SavedPlace[]) => void
-  renderItem: (place: SavedPlace) => ReactNode
-  empty: ReactNode
+  items: SavedPlace[];
+  onReorder: (next: SavedPlace[]) => void;
+  renderItem: (place: SavedPlace) => ReactNode;
+  empty: ReactNode;
 }) {
   function handleDragEnd(result: DropResult) {
-    if (!result.destination) return
-    const src = result.source.index
-    const dst = result.destination.index
-    if (src === dst) return
+    if (!result.destination) return;
+    const src = result.source.index;
+    const dst = result.destination.index;
+    if (src === dst) return;
 
-    const next = [...items]
-    const [moved] = next.splice(src, 1)
-    next.splice(dst, 0, moved)
-    onReorder(next)
+    const next = [...items];
+    const [moved] = next.splice(src, 1);
+    next.splice(dst, 0, moved);
+    onReorder(next);
   }
 
   if (items.length === 0) {
-    return <>{empty}</>
+    return <>{empty}</>;
   }
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="pinned-list" direction="vertical">
         {(provided) => (
-          <div 
+          <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             className="grid grid-cols-1 gap-4 sm:grid-cols-2"
@@ -57,11 +62,13 @@ export function PinnedList({
                     {...provided.draggableProps}
                     style={{
                       ...provided.draggableProps.style,
-                      zIndex: snapshot.isDragging ? 50 : 'auto',
+                      zIndex: snapshot.isDragging ? 50 : "auto",
                     }}
-                    className={`group ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                    className={`group ${
+                      snapshot.isDragging ? "shadow-lg" : ""
+                    }`}
                   >
-                    <div 
+                    <div
                       {...provided.dragHandleProps}
                       className="mb-1 flex items-center gap-2 text-muted-foreground cursor-grab"
                     >
@@ -81,5 +88,5 @@ export function PinnedList({
         )}
       </Droppable>
     </DragDropContext>
-  )
+  );
 }

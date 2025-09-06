@@ -1,0 +1,15 @@
+.threads-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none;
+  background: transparent;
+  overflow: hidden;
+  mix-blend-mode: plus-lighter;
+}
+
+.threads-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

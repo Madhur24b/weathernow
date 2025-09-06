@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Wind, Droplet } from "lucide-react"
-import { getForecastUrl, mapWeatherToIcon, formatTemp } from "@/lib/weather"
+import useSWR from "swr";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Wind, Droplet } from "lucide-react";
+import { getForecastUrl, mapWeatherToIcon, formatTemp } from "@/lib/weather";
 
 type SavedPlace = {
-  id: string
-  name: string
-  admin1?: string
-  country?: string
-  latitude: number
-  longitude: number
-}
+  id: string;
+  name: string;
+  admin1?: string;
+  country?: string;
+  latitude: number;
+  longitude: number;
+};
 
 export function WeatherCard({
   place,
@@ -22,28 +22,28 @@ export function WeatherCard({
   onUnpin,
   highlight = false,
 }: {
-  place: SavedPlace
-  unit: "c" | "f"
-  onUnpin?: () => void
-  highlight?: boolean
+  place: SavedPlace;
+  unit: "c" | "f";
+  onUnpin?: () => void;
+  highlight?: boolean;
 }) {
-  const url = getForecastUrl(place.latitude, place.longitude)
+  const url = getForecastUrl(place.latitude, place.longitude);
   const { data, isLoading, error, mutate } = useSWR(
     url,
     async (u) => {
-      const res = await fetch(u)
+      const res = await fetch(u);
       if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.error || 'Failed to fetch weather data')
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to fetch weather data");
       }
-      return res.json()
+      return res.json();
     },
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
-      retry: 2
+      retry: 2,
     }
-  )
+  );
 
   if (isLoading) {
     return (
@@ -57,7 +57,7 @@ export function WeatherCard({
           <Skeleton className="h-20 w-full" />
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (!data) {
@@ -67,49 +67,59 @@ export function WeatherCard({
           <CardTitle className="text-base">{place.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-2 text-sm text-muted-foreground">Failed to load weather.</p>
+          <p className="mb-2 text-sm text-muted-foreground">
+            Failed to load weather.
+          </p>
           <Button variant="outline" size="sm" onClick={() => mutate()}>
             Retry
           </Button>
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  const current = data.current
-  const daily = data.daily
-  const temp = formatTemp(current.temperature_2m, unit)
-  const feels = formatTemp(current.apparent_temperature, unit)
-  const wind = current.wind_speed_10m
-  const humidity = current.relative_humidity_2m
-  const Icon = mapWeatherToIcon(current.weather_code, current.is_day === 1)
+  const current = data.current;
+  const daily = data.daily;
+  const temp = formatTemp(current.temperature_2m, unit);
+  const feels = formatTemp(current.apparent_temperature, unit);
+  const wind = current.wind_speed_10m;
+  const humidity = current.relative_humidity_2m;
+  const Icon = mapWeatherToIcon(current.weather_code, current.is_day === 1);
 
   return (
-    <Card className={`card ${highlight ? "ring-1 ring-cyan-600" : ""}`}>
+    <Card className={`card ${highlight ? "ring-1 ring-cyan-600/50" : ""}`}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-base">
+          <CardTitle className="text-base font-semibold text-foreground/90">
             {place.name}
             {place.admin1 ? `, ${place.admin1}` : ""}
             {place.country ? `, ${place.country}` : ""}
           </CardTitle>
           {onUnpin && (
-            <Button variant="ghost" size="sm" onClick={onUnpin} aria-label="Unpin city">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onUnpin}
+              aria-label="Unpin city"
+              className="opacity-60 hover:opacity-100"
+            >
               Remove
             </Button>
           )}
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between backdrop-brightness-110">
           <div>
             <div className="flex items-center gap-2">
-              <Icon className="h-7 w-7 text-cyan-600" />
-              <div className="text-2xl font-semibold">{temp}</div>
+              <Icon className="h-7 w-7 text-cyan-500" />
+              <div className="text-2xl font-bold text-foreground/90">{temp}</div>
             </div>
-            <div className="text-sm text-muted-foreground">Feels like {feels}</div>
+            <div className="text-sm text-foreground/70">
+              Feels like {feels}
+            </div>
           </div>
-          <div className="grid gap-1 text-right text-xs text-muted-foreground">
+          <div className="grid gap-1 text-right text-xs text-foreground/70">
             <div className="flex items-center justify-end gap-1">
               <Wind className="h-3.5 w-3.5" /> {wind} m/s
             </div>
@@ -121,24 +131,28 @@ export function WeatherCard({
 
         <div className="mt-4 grid grid-cols-5 gap-2">
           {daily.time.slice(0, 5).map((iso: string, idx: number) => {
-            const tmin = daily.temperature_2m_min[idx]
-            const tmax = daily.temperature_2m_max[idx]
-            const wcode = daily.weather_code[idx]
-            const DayIcon = mapWeatherToIcon(wcode, true)
-            const date = new Date(iso)
-            const label = date.toLocaleDateString(undefined, { weekday: "short" })
+            const tmin = daily.temperature_2m_min[idx];
+            const tmax = daily.temperature_2m_max[idx];
+            const wcode = daily.weather_code[idx];
+            const DayIcon = mapWeatherToIcon(wcode, true);
+            const date = new Date(iso);
+            const label = date.toLocaleDateString(undefined, {
+              weekday: "short",
+            });
             return (
-              <div key={iso} className="rounded-md border p-2 text-center">
-                <div className="text-xs">{label}</div>
+              <div key={iso} className="rounded-md border border-white/5 bg-white/[0.02] p-2 text-center backdrop-blur-sm">
+                <div className="text-xs text-foreground/80">{label}</div>
                 <div className="my-1 flex items-center justify-center">
-                  <DayIcon className="h-4 w-4 text-cyan-600" />
+                  <DayIcon className="h-4 w-4 text-cyan-500" />
                 </div>
                 <div className="text-xs">
-                  <span className="font-medium">{formatTemp(tmax, unit)}</span>{" "}
-                  <span className="text-muted-foreground">{formatTemp(tmin, unit)}</span>
+                  <span className="font-semibold text-foreground/90">{formatTemp(tmax, unit)}</span>{" "}
+                  <span className="text-foreground/60">
+                    {formatTemp(tmin, unit)}
+                  </span>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
 
@@ -149,5 +163,5 @@ export function WeatherCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
